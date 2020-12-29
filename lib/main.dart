@@ -12,10 +12,73 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  TextEditingController username_controller = TextEditingController();
-  TextEditingController password_controller = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   String uname = '';
   String pwd = '';
+  bool visible = false;
+
+  Future UserLogin() async {
+    // Showing CircularProgressIndicator.
+    setState(() {
+      visible = true;
+    });
+
+    // Getting value from Controller
+    String email = emailController.text;
+    String password = passwordController.text;
+
+    // SERVER LOGIN API URL
+    var url = 'http://192.168.8.196/FlutterLoginAPI/1.php';
+
+    // Store all data with Param Name.
+    var data = {'email': email, 'password': password};
+
+    // Starting Web API Call.
+    var response = await http.post(url, body: json.encode(data));
+
+    // Getting Server response into variable.
+    var message = jsonDecode(response.body);
+
+    // If the Response Message is Matched.
+    if (message == 'Login Matched') {
+      // Hiding the CircularProgressIndicator.
+      setState(() {
+        visible = false;
+      });
+      print("You are login sucessfully");
+      // // Navigate to Profile Screen & Sending Email to Next Screen.
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => ProfileScreen(email : emailController.text))
+      //   );
+    } else {
+      // If Email or Password did not Matched.
+      // Hiding the CircularProgressIndicator.
+      setState(() {
+        visible = false;
+      });
+
+      // // Showing Alert Dialog with Response JSON Message.
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text('message'),
+            actions: <Widget>[
+              FlatButton(
+                child: new Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      print("Login Failed");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +92,7 @@ class _MyAppState extends State<MyApp> {
             Container(
                 margin: EdgeInsets.all(20),
                 child: TextField(
-                  controller: username_controller,
+                  controller: emailController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'User Name',
@@ -37,9 +100,6 @@ class _MyAppState extends State<MyApp> {
                   onChanged: (text) {
                     setState(() {
                       uname = text;
-                      //you can access nameController in its scope to get
-                      // the value of text entered as shown below
-                      //fullName = nameController.text;
                     });
                   },
                 )),
@@ -47,7 +107,7 @@ class _MyAppState extends State<MyApp> {
                 margin: EdgeInsets.all(20),
                 child: TextField(
                   obscureText: true,
-                  controller: password_controller,
+                  controller: passwordController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Passsword',
@@ -55,18 +115,9 @@ class _MyAppState extends State<MyApp> {
                   onChanged: (text) {
                     setState(() {
                       pwd = text;
-                      //you can access nameController in its scope to get
-                      // the value of text entered as shown below
-                      //fullName = nameController.text;
                     });
                   },
                 )),
-
-            // Container(
-            //   margin: EdgeInsets.all(20),
-            //   child: Text(pwd),
-            // )
-
             Container(
                 height: 50,
                 padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -74,15 +125,14 @@ class _MyAppState extends State<MyApp> {
                   textColor: Colors.white,
                   color: Colors.blue,
                   child: Text('Login'),
-                  onPressed: () {
-                    print(username_controller.text);
-                    print(password_controller.text);
-
-                    
-                  },
+                  onPressed: UserLogin,
                 )),
+            Visibility(
+                visible: visible,
+                child: Container(
+                    margin: EdgeInsets.only(bottom: 30),
+                    child: CircularProgressIndicator())),
           ]))),
     );
   }
 }
-

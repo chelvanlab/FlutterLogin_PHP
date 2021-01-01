@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:SampleLogin/profile.dart';
+import 'package:SampleLogin/signup.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(title: 'Coflutter'),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   String uname = '';
@@ -47,11 +66,12 @@ class _MyAppState extends State<MyApp> {
         visible = false;
       });
       print("You are login sucessfully");
-      // // Navigate to Profile Screen & Sending Email to Next Screen.
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => ProfileScreen(email : emailController.text))
-      //   );
+      // Navigate to Profile Screen & Sending Email to Next Screen.
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  ProfileScreen(email: emailController.text)));
     } else {
       // If Email or Password did not Matched.
       // Hiding the CircularProgressIndicator.
@@ -64,7 +84,7 @@ class _MyAppState extends State<MyApp> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: new Text('message'),
+            title: new Text(message),
             actions: <Widget>[
               FlatButton(
                 child: new Text("OK"),
@@ -127,6 +147,22 @@ class _MyAppState extends State<MyApp> {
                   child: Text('Login'),
                   onPressed: UserLogin,
                 )),
+            Container(
+                height: 50,
+                padding: EdgeInsets.fromLTRB(10, 25, 10, 0),
+                child: Text("If you don`t have an Account SignUp below")),
+            Container(
+              height: 50,
+              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: FlatButton(
+                onPressed: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => SignupPage()));
+                  print("singup page opening");
+                },
+                child: new Text("SignUp"),
+              ),
+            ),
             Visibility(
                 visible: visible,
                 child: Container(
